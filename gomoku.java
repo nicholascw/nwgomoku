@@ -1,3 +1,4 @@
+import javax.xml.soap.Text;
 import java.util.*;
 
 public class gomoku {
@@ -11,8 +12,9 @@ public class gomoku {
     public static final String ANSI_CYAN = "\u001B[36m";
     public static final String ANSI_WHITE = "\u001B[37m";
     public static final String ANSI_BOLD = "\u001B[1m";
-    public static byte[] stoneHistory = new byte[225];
+    public static int[] stoneHistory = new int[225];
     public static short currentStep = 0;
+    public static int chessBoard[][] = new int[15][15];
 
     public static void main(String[] args) {
         boolean sPlayer = false;
@@ -27,26 +29,63 @@ public class gomoku {
             else sPlayer = true;
         }
         //chessBoard definition: 0 unset, 1 player1, 2 player2/cpuplayer
-        int chessBoard[][] = new int[15][15];
-        for (int iBoard[] : chessBoard) {
-            for (int jBoard : iBoard) {
-                jBoard = 0;
-            }
-        }
-        TextIO cmd = new TextIO();
-        initBoard();
-        for (currentStep = 0; currentStep < 225; currentStep++) {
-            if (currentStep % 2 == 0) { //Player 1
+        for (int iBoard[] : chessBoard)
+            for (int jBoard : iBoard) jBoard = 0;
 
+        initBoard();
+        for (currentStep = 0; currentStep <= 225; currentStep++) {
+            if (currentStep % 2 == 0) { //Player 1
+                cursorMoveTo(1, 31);
+                System.out.print(ANSI_GREEN + "Player 1's turn" + ANSI_RESET);
+                cursorMoveTo(2, 33);
+                while (!proceedPlayerCmd(1, TextIO.getln())) notifyInvalidCmd();
+                cursorMoveTo(1, 31);
+                System.out.print("                                   ");
+                cursorMoveTo(2, 33);
             } else {
                 if (!sPlayer) { //Multi Player: Player 2
-
+                    cursorMoveTo(1, 31);
+                    System.out.print(ANSI_GREEN + "Player 2's turn" + ANSI_RESET);
+                    cursorMoveTo(2, 33);
+                    while (!proceedPlayerCmd(2, TextIO.getln())) notifyInvalidCmd();
+                    cursorMoveTo(1, 31);
+                    System.out.print("                                   ");
+                    cursorMoveTo(2, 33);
                 } else {//Single Player: CPU Player
-
+                    proceedCPUCmd();
                 }
             }
         }
     }
+
+    public static void notifyInvalidCmd() {
+        cursorMoveTo(1, 31);
+        System.out.print(ANSI_RED + ANSI_BOLD + "Coordinate invalid, please retry." + ANSI_RESET);
+        cursorMoveTo(1, 33);
+        System.out.print(":                         ");
+        cursorMoveTo(2, 33);
+    }
+
+    public static boolean proceedPlayerCmd(final int Player, final String Coordinate) {
+        int x, y, tmp = coordinateParser(Coordinate);
+        if (tmp == 0) {
+            return false;
+        }
+        x = tmp % 100;
+        y = tmp / 100;
+        if (chessBoard[x][y] != 0) {
+            return false;
+        }
+        chessBoard[x][y] = Player;
+        putStoneOnBoard(Player, x, y);
+        stoneHistory[currentStep] = tmp;
+        return true;
+    }
+
+    public static boolean proceedCPUCmd() {
+        return true;
+    }
+
 
     public static void initBoard() {
         System.out.print("\033[H\033[2J");
@@ -84,16 +123,10 @@ public class gomoku {
                 "Enter your decision coordinate in format like \"7J\"\n:");
     }
 
-    public static boolean putStoneOnBoard(final int Player, String Coordinate) {
-        int x, y, tmp = coordinateParser(Coordinate);
-        if (tmp == 0) {
-            return false;
-        }
-        x = tmp % 100;
-        y = tmp / 100;
+    public static boolean putStoneOnBoard(final int Player, final int x, final int y) {
         int termX, termY;
         termX = 4 * (x - 1);//0,4,8,12...
-        termY = y * 2 - 1;//1,3,5,7...
+        termY = y * 2;//1,3,5,7...
         String strStone = "";
         switch (Player) {
             case 1:
@@ -105,9 +138,9 @@ public class gomoku {
         }
         cursorMoveTo(termX, termY);
         System.out.print(strStone);
-        cursorMoveTo(0, 31);
+        cursorMoveTo(1, 33);
         System.out.print(":                  ");
-        cursorMoveTo(1, 31);
+        cursorMoveTo(2, 33);
         return true;
     }
 
