@@ -73,10 +73,10 @@ public class gomoku {
         }
         x = tmp % 100;
         y = tmp / 100;
-        if (chessBoard[x][y] != 0) {
+        if (chessBoard[x - 1][y - 1] != 0) {
             return false;
         }
-        chessBoard[x][y] = Player;
+        chessBoard[x - 1][y - 1] = Player;
         putStoneOnBoard(Player, x, y);
         stoneHistory[currentStep] = tmp;
         return true;
