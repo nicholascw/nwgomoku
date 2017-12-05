@@ -1,5 +1,9 @@
+
 # MP-7
 [![BuildStatus](https://travis-ci.org/nicholascw/nwgomoku.svg?branch=master)](https://travis-ci.org/nicholascw/nwgomoku)
+[![GitHubLicense](https://img.shields.io/github/license/nicholascw/nwgomoku.svg)](https://github.com/nicholascw/nwgomoku/blob/master/LICENSE)
+[![GitHubIssues](https://img.shields.io/github/issues/nicholascw/nwgomoku.svg)](https://github.com/nicholascw/nwgomoku/issues)
+[![GithubFileSize](https://img.shields.io/github/size/webcaetano/craft/build/phaser-craft.min.js.svg)](https://github.com/nicholascw/nwgomoku/releases)
 
 A **gomoku** game run on terminal support single and multiplayer mode.
 
