@@ -204,10 +204,10 @@ public class gomoku {
         String strStone = "";
         switch (Player) {
             case 1:
-                strStone = "● ";
+                strStone = "●";
                 break;
             case 2:
-                strStone = "○ ";
+                strStone = "○";
                 break;
         }
         cursorMoveTo(termX, termY);
