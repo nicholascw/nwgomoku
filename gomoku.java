@@ -158,9 +158,9 @@ public static final int[][] cweight = new int[15][15];
     		}
     	}
     	if (pmax > cmax) {
-    		chessboard[pmaxcoordinates[0]][pmaxcoordinates[1]] = 2;
+    		chessBoard[pmaxcoordinates[0]][pmaxcoordinates[1]] = 2;
     	} else {
-    		chessboard[cmaxcoordinates[0]][cmaxcoordinates[1]] = 2;
+    		chessBoard[cmaxcoordinates[0]][cmaxcoordinates[1]] = 2;
     	}
         return true;
     }
