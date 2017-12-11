@@ -99,10 +99,11 @@ public static final int[][] pweight = new int[15][15];
 public static final int[][] cweight = new int[15][15];
 	
     public static boolean proceedCPUCmd() {
-    	pweight[i][j] = 0;
-		cweight[i][j] = 0;
+    	
     	for (int i = 0; i < 15; i++) {
     		for (int j = 0; j < 15; j++) {
+			pweight[i][j] = 0;
+	                cweight[i][j] = 0;
     			if (chessBoard[i][j] == 0) {
 	    			if (chainDetect(5, 1) == 1) {
 	    				pweight[i][j] += 10000;
@@ -157,9 +158,9 @@ public static final int[][] cweight = new int[15][15];
     		}
     	}
     	if (pmax > cmax) {
-    		chessboard[pmaxcoordinates[0]][pmaxcoordinate[1]] = 2;
+    		chessboard[pmaxcoordinates[0]][pmaxcoordinates[1]] = 2;
     	} else {
-    		chessboard[cmaxcoordinates[0]][cmaxcoordinate[1]] = 2;
+    		chessboard[cmaxcoordinates[0]][cmaxcoordinates[1]] = 2;
     	}
         return true;
     }
