@@ -95,7 +95,9 @@ public class gomoku {
         stoneHistory[currentStep] = tmp;
         return true;
     }
-
+public static final int[][] pweight = new int[15][15];
+public static final int[][] cweight = new int[15][15];
+	
     public static boolean proceedCPUCmd() {
     	pweight[i][j] = 0;
 		cweight[i][j] = 0;
