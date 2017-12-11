@@ -97,7 +97,131 @@ public class gomoku {
     }
 
     public static boolean proceedCPUCmd() {
+    	pweight[i][j] = 0;
+		cweight[i][j] = 0;
+    	for (int i = 0; i < 15; i++) {
+    		for (int j = 0; j < 15; j++) {
+    			if (chessBoard[i][j] == 0) {
+	    			if (chainDetect(5, 1) == 1) {
+	    				pweight[i][j] += 10000;
+	    			}
+	    			if (chainDetect(4, 1) == 1) {
+	    				pweight[i][j] += 420;
+	    			}
+	    			if (chainDetect(3, 1) == 1) {
+	    				pweight[i][j] += 195;
+	    			}
+	    			if (chainDetect(2, 1) == 1) {
+	    				pweight[i][j] += 60;
+	    			}
+	    			if (chainDetect(1, 1) == 1) {
+	    				pweight[i][j] += 10;
+	    			}
+	    			if (chainDetect(5, 2) == 2) {
+	    				cweight[i][j] += 100000;
+	    			}
+	    			if (chainDetect(4, 2) == 2) {
+	    				cweight[i][j] += 500;
+	    			}
+	    			if (chainDetect(3, 2) == 2) {
+	    				cweight[i][j] += 210;
+	    			}
+	    			if (chainDetect(2, 2) == 2) {
+	    				cweight[i][j] += 65;
+	    			}
+	    			if (chainDetect(1, 2) == 2) {
+	    				cweight[i][j] += 12;
+	    			}
+    			}
+    		}
+    	}
+    	int pmax = 0;
+    	int[] pmaxcoordinates = {0, 0};
+    	int cmax = 0;
+    	int[] cmaxcoordinates = {0, 0};
+    	for (int i = 0; i < 15; i++) {
+    		for (int j = 0; j < 15; j++) {
+    			if (pweight[i][j] > pmax) {
+    				pmax = pweight[i][j];
+    				pmaxcoordinates[0] = i;
+    				pmaxcoordinates[1] = j;
+    				
+    			}
+    			if (cweight[i][j] > cmax) {
+    				cmax = cweight[i][j];
+    				cmaxcoordinates[0] = i;
+    				cmaxcoordinates[1] = j;
+    			}
+    		}
+    	}
+    	if (pmax > cmax) {
+    		chessboard[pmaxcoordinates[0]][pmaxcoordinate[1]] = 2;
+    	} else {
+    		chessboard[cmaxcoordinates[0]][cmaxcoordinate[1]] = 2;
+    	}
         return true;
+    }
+    public static int chainDetect(int numChain, int mode) {
+    	 int x, y;
+         x = (stoneHistory[currentStep] % 100) - 1;
+         y = (stoneHistory[currentStep] / 100) - 1;
+         int[][] rowData = new int[4][9];
+         for (int i = 0; i < rowData.length; i++)
+             for (int j = 0; j < rowData[i].length; j++)
+                 rowData[i][j] = 0;
+         int xMin, xMax, yMin, yMax;
+         xMin = (x >= 4 ? x - 4 : 0);
+         xMax = (x <= 10 ? x + 4 : 14);
+         yMin = (y >= 4 ? y - 4 : 0);
+         yMax = (y <= 10 ? y + 4 : 14);
+         for (int iX = xMin; iX <= xMax; iX++) {
+             rowData[0][iX - xMin] = chessBoard[iX][y];
+         }
+         for (int iY = yMin; iY <= yMax; iY++) {
+             rowData[1][iY - yMin] = chessBoard[x][iY];
+         }
+
+         int tmpI = 0;
+         while (tmpI <= 4 && x + tmpI <= xMax && y + tmpI <= yMax) {
+             rowData[2][4 + tmpI] = chessBoard[x + tmpI][y + tmpI];
+             tmpI++;
+         }
+         tmpI = 1;
+         while (tmpI <= 4 && x - tmpI >= xMin && y - tmpI >= yMin) {
+             rowData[2][4 - tmpI] = chessBoard[x - tmpI][y - tmpI];
+             tmpI++;
+         }
+
+         tmpI = 0;
+         while (tmpI <= 4 && x - tmpI >= xMin && y + tmpI <= yMax) {
+             rowData[3][4 - tmpI] = chessBoard[x - tmpI][y + tmpI];
+             tmpI++;
+         }
+         tmpI = 1;
+         while (tmpI <= 4 && x + tmpI <= xMax && y - tmpI >= yMin) {
+             rowData[3][4 + tmpI] = chessBoard[x + tmpI][y - tmpI];
+             tmpI++;
+         }
+
+         for (int i = 0; i < rowData.length; i++) {
+             int tmpCounter = 1;
+             int winningPlayer;
+             for (int j = 1; j < rowData[i].length; j++) {
+                 if (rowData[i][j - 1] == rowData[i][j] && rowData[i][j] != 0) {
+                     tmpCounter++;
+                     winningPlayer = rowData[i][j];
+                 } else {
+                     tmpCounter = 1;
+                     winningPlayer = 0;
+                 }
+                 if (tmpCounter == numChain && winningPlayer == mode) {
+                     return winningPlayer;
+                 }
+             }
+         }
+    	return 0;
+    	
+    	
     }
 
     public static int winDetect() {
