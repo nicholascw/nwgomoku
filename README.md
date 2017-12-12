@@ -63,5 +63,5 @@ $ java gomoku version
 ```
 
 ### Advanced Usage
-    Share your console session through SSH or telnet, then view the same session by screen's `screen -x` option.
+    Share your console session through SSH or telnet, then view the same session by screen's screen -x option.
 
