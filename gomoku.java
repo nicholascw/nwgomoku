@@ -1,34 +1,37 @@
-import javax.xml.soap.Text;
-import java.util.*;
-
 public class gomoku {
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_BLACK = "\u001B[30m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_BLUE = "\u001B[34m";
-    public static final String ANSI_PURPLE = "\u001B[35m";
-    public static final String ANSI_CYAN = "\u001B[36m";
-    public static final String ANSI_WHITE = "\u001B[37m";
-    public static final String ANSI_BOLD = "\u001B[1m";
-    public static final String ANSI_BELL = "\007";
-    public static int[] stoneHistory = new int[225];
-    public static short currentStep = 0;
-    public static int chessBoard[][] = new int[15][15];
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_BLACK = "\u001B[30m";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_BLUE = "\u001B[34m";
+    private static final String ANSI_PURPLE = "\u001B[35m";
+    private static final String ANSI_CYAN = "\u001B[36m";
+    private static final String ANSI_WHITE = "\u001B[37m";
+    private static final String ANSI_BOLD = "\u001B[1m";
+    private static final String ANSI_BELL = "\007";
+    private static int[] stoneHistory = new int[225];
+    private static short currentStep = 0;
+    private static int chessBoard[][] = new int[15][15];
     //chessBoard definition: 0 unset, 1 player1, 2 player2/cpuplayer
 
     public static void main(String[] args) {
         boolean sPlayer = false;
         if (args.length > 0) {
-            if (!args[0].equals("single"))
+            if (args[0].equals("single"))
+                sPlayer = true;
+            else if (args[0].equals("version")) {
+                System.out.println("NW Gomoku v1.0.0");
+                return;
+            } else {
                 System.out.println(ANSI_CYAN + "A Gomoku Game by Nicholas@UIUC.\n\n" +
                         "USAGE: gomoku [OPTIONS] ...\n" +
                         "To activate single player mode, use argument 'single'.\n" +
                         "For bugs report please touch " + ANSI_YELLOW + ANSI_BOLD +
                         "chenkai3@illinois.edu" + ANSI_RESET + ANSI_CYAN +
                         ".\n======================================================\n\n" + ANSI_RESET);
-            else sPlayer = true;
+                return;
+            }
         }
         while (true) {
             for (int iBoard[] : chessBoard)
@@ -72,7 +75,7 @@ public class gomoku {
         }
     }
 
-    public static void notifyInvalidCmd() {
+    private static void notifyInvalidCmd() {
         cursorMoveTo(1, 31);
         System.out.print(ANSI_RED + ANSI_BOLD + "Coordinate invalid, please retry." + ANSI_BELL + ANSI_RESET);
         cursorMoveTo(1, 33);
@@ -80,7 +83,7 @@ public class gomoku {
         cursorMoveTo(2, 33);
     }
 
-    public static boolean proceedPlayerCmd(final int Player, final String Coordinate) {
+    private static boolean proceedPlayerCmd(final int Player, final String Coordinate) {
         int x, y, tmp = coordinateParser(Coordinate);
         if (tmp == 0) {
             return false;
@@ -96,112 +99,112 @@ public class gomoku {
         return true;
     }
 
-public static final int[][] pweight = new int[15][15];
-public static final int[][] cweight = new int[15][15];
+    private static final int[][] pweight = new int[15][15];
+    private static final int[][] cweight = new int[15][15];
 
-    public static boolean proceedCPUCmd() {
-    	
-    	for (int i = 0; i < 15; i++) {
-    		for (int j = 0; j < 15; j++) {
-    			pweight[i][j] = 0;
-	            cweight[i][j] = 0;
-	            if (chessBoard[i][j] != 0) {
-	            	pweight[i][j] = -1;
-		            cweight[i][j] = -1;
-	            }
-    			if (chessBoard[i][j] == 0) {
-	    			if (chainDetect(5, 1, i, j)) {
-	    				pweight[i][j] += 1000;
-	    			}
-	    			if (chainDetect(4, 1, i, j)) {
-	    				pweight[i][j] += 420;
-	    			}
-	    			if (chainDetect(3, 1, i, j)) {
-	    				pweight[i][j] += 195;
-	    			}
-	    			if (chainDetect(2, 1, i, j)) {
-	    				pweight[i][j] += 60;
-	    			}
-	    			if (chainDetect(1, 1, i, j)) {
-	    				pweight[i][j] += 10;
-	    			}
-	    			if (chainDetect(5, 2, i, j)) {
-	    				cweight[i][j] += 10000;
-	    			}
-	    			if (chainDetect(4, 2, i, j)) {
-	    				cweight[i][j] += 500;
-	    			}
-	    			if (chainDetect(3, 2, i, j)) {
-	    				cweight[i][j] += 210;
-	    			}
-	    			if (chainDetect(2, 2, i, j)) {
-	    				cweight[i][j] += 65;
-	    			}
-	    			if (chainDetect(1, 2, i, j)) {
-	    				cweight[i][j] += 12;
-	    			}
-    			}
-    		}
-    	}
-    	int pmax = 0;
-    	int[] pmaxcoordinates = {0, 0};
-    	int cmax = 1;
-    	int[] cmaxcoordinates = {7, 7};
-    	for (int i = 0; i < 15; i++) {
-    		for (int j = 0; j < 15; j++) {
-    			if (pweight[i][j] > pmax) {
-    				pmax = pweight[i][j];
-    				pmaxcoordinates[0] = i;
-    				pmaxcoordinates[1] = j;
-    			}
-    			if (cweight[i][j] > cmax) {
-    				cmax = cweight[i][j];
-    				cmaxcoordinates[0] = i;
-    				cmaxcoordinates[1] = j;
-    			}
-    		}
-    	}
-    	if (pmax > cmax) {
-    		chessBoard[pmaxcoordinates[0]][pmaxcoordinates[1]] = 2;
-    		putStoneOnBoard(2, pmaxcoordinates[0] + 1, pmaxcoordinates[1] + 1);
+    private static void proceedCPUCmd() {
+
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                pweight[i][j] = 0;
+                cweight[i][j] = 0;
+                if (chessBoard[i][j] != 0) {
+                    pweight[i][j] = -1;
+                    cweight[i][j] = -1;
+                }
+                if (chessBoard[i][j] == 0) {
+                    if (chainDetect(5, 1, i, j)) {
+                        pweight[i][j] += 1000;
+                    }
+                    if (chainDetect(4, 1, i, j)) {
+                        pweight[i][j] += 420;
+                    }
+                    if (chainDetect(3, 1, i, j)) {
+                        pweight[i][j] += 195;
+                    }
+                    if (chainDetect(2, 1, i, j)) {
+                        pweight[i][j] += 60;
+                    }
+                    if (chainDetect(1, 1, i, j)) {
+                        pweight[i][j] += 10;
+                    }
+                    if (chainDetect(5, 2, i, j)) {
+                        cweight[i][j] += 10000;
+                    }
+                    if (chainDetect(4, 2, i, j)) {
+                        cweight[i][j] += 500;
+                    }
+                    if (chainDetect(3, 2, i, j)) {
+                        cweight[i][j] += 210;
+                    }
+                    if (chainDetect(2, 2, i, j)) {
+                        cweight[i][j] += 65;
+                    }
+                    if (chainDetect(1, 2, i, j)) {
+                        cweight[i][j] += 12;
+                    }
+                }
+            }
+        }
+        int pmax = 0;
+        int[] pmaxcoordinates = {0, 0};
+        int cmax = 1;
+        int[] cmaxcoordinates = {7, 7};
+        for (int i = 0; i < 15; i++) {
+            for (int j = 0; j < 15; j++) {
+                if (pweight[i][j] > pmax) {
+                    pmax = pweight[i][j];
+                    pmaxcoordinates[0] = i;
+                    pmaxcoordinates[1] = j;
+                }
+                if (cweight[i][j] > cmax) {
+                    cmax = cweight[i][j];
+                    cmaxcoordinates[0] = i;
+                    cmaxcoordinates[1] = j;
+                }
+            }
+        }
+        if (pmax > cmax) {
+            chessBoard[pmaxcoordinates[0]][pmaxcoordinates[1]] = 2;
+            putStoneOnBoard(2, pmaxcoordinates[0] + 1, pmaxcoordinates[1] + 1);
             stoneHistory[currentStep] = (pmaxcoordinates[1] + 1) * 100 + pmaxcoordinates[0] + 1;
-    	} else {
-    		chessBoard[cmaxcoordinates[0]][cmaxcoordinates[1]] = 2;
-    		putStoneOnBoard(2, cmaxcoordinates[0] + 1, cmaxcoordinates[1] + 1);
+        } else {
+            chessBoard[cmaxcoordinates[0]][cmaxcoordinates[1]] = 2;
+            putStoneOnBoard(2, cmaxcoordinates[0] + 1, cmaxcoordinates[1] + 1);
             stoneHistory[currentStep] = (cmaxcoordinates[1] + 1) * 100 + cmaxcoordinates[0] + 1;
-    	}
-        return true;
+        }
+        return;
     }
 
-    public static boolean chainDetect(int numChain, int mode, final int x, final int y) {
-    	int counter;
-    	// for numChain to x-left
-    	chessBoard[x][y] = mode;
-    	if (x - numChain + 1 >= 0) {
-    		counter = 0;
-    		for (int i = x - numChain + 1; i <= x; i++) {
-    			if (chessBoard[i][y] == mode) {
-    				counter++;
-    			}
-    		}
-    		if (counter == numChain) {
-    			chessBoard[x][y] = 0;
-    			return true;
-    		}
-    	}
-    	// for numChain to x-right
-    	if (x + numChain - 1 <= 14) {
-    		counter = 0;
-    		for (int i = x + numChain - 1; i >= x; i--) {
-    			if (chessBoard[i][y] == mode) {
-    				counter++;
-    			}
-    		}
-    		if (counter == numChain) {
-    			chessBoard[x][y] = 0;
-    			return true;
-    		}
-    	}
+    private static boolean chainDetect(int numChain, int mode, final int x, final int y) {
+        int counter;
+        // for numChain to x-left
+        chessBoard[x][y] = mode;
+        if (x - numChain + 1 >= 0) {
+            counter = 0;
+            for (int i = x - numChain + 1; i <= x; i++) {
+                if (chessBoard[i][y] == mode) {
+                    counter++;
+                }
+            }
+            if (counter == numChain) {
+                chessBoard[x][y] = 0;
+                return true;
+            }
+        }
+        // for numChain to x-right
+        if (x + numChain - 1 <= 14) {
+            counter = 0;
+            for (int i = x + numChain - 1; i >= x; i--) {
+                if (chessBoard[i][y] == mode) {
+                    counter++;
+                }
+            }
+            if (counter == numChain) {
+                chessBoard[x][y] = 0;
+                return true;
+            }
+        }
 
     /*	// for numChain x-left to x-right: 3
     	if (x - numChain + 2 >= 0 && x + numChain - 2 <= 14) {
@@ -287,19 +290,19 @@ public static final int[][] cweight = new int[15][15];
     		}
     	}
     	*/
-    	// for numChain to y-top
-    	if (y - numChain + 1 >= 0) {
-    		counter = 0;
-    		for (int i = y - numChain + 1; i <= y; i++) {
-    			if (chessBoard[x][i] == mode) {
-    				counter++;
-    			}
-    		}
-    		if (counter == numChain) {
-    			chessBoard[x][y] = 0;
-    			return true;
-    		}
-    	}
+        // for numChain to y-top
+        if (y - numChain + 1 >= 0) {
+            counter = 0;
+            for (int i = y - numChain + 1; i <= y; i++) {
+                if (chessBoard[x][i] == mode) {
+                    counter++;
+                }
+            }
+            if (counter == numChain) {
+                chessBoard[x][y] = 0;
+                return true;
+            }
+        }
 
    /* 	// for numchain y: top to bottom: 3
     	if (y - numChain + 2 >= 0 && y + numChain - 2 <= 14) {
@@ -384,93 +387,91 @@ public static final int[][] cweight = new int[15][15];
     			return true;
     		}
     	}*/
-    	// for numChain to y-bottom
-    	if (y + numChain - 1 <= 14) {
-    		counter = 0;
-    		for (int i = y + numChain - 1; i >= y; i--) {
-    			if (chessBoard[x][i] == mode) {
-    				counter++;
-    			}
-    		}
-    		if (counter == numChain) {
-    			chessBoard[x][y] = 0;
-    			return true;
-    		}
-    	}
+        // for numChain to y-bottom
+        if (y + numChain - 1 <= 14) {
+            counter = 0;
+            for (int i = y + numChain - 1; i >= y; i--) {
+                if (chessBoard[x][i] == mode) {
+                    counter++;
+                }
+            }
+            if (counter == numChain) {
+                chessBoard[x][y] = 0;
+                return true;
+            }
+        }
 
-    	//for numChain to north-west
-    	if (x - numChain + 1 >= 0 && y - numChain + 1 >= 0) {
-    		counter = 0;
-    		for (int i = x - numChain + 1; i <= x; i++) {
-    			for (int j = y - numChain + 1; j <= y; j++) {
-    				if (chessBoard[i][j++] == mode) {
-        				counter++;
-    				}
-    				break;
-    			}
-    		}
-    		if (counter == numChain) {
-    			chessBoard[x][y] = 0;
-    			return true;
-    		}
-    	}
+        //for numChain to north-west
+        if (x - numChain + 1 >= 0 && y - numChain + 1 >= 0) {
+            counter = 0;
+            for (int i = x - numChain + 1; i <= x; i++) {
+                for (int j = y - numChain + 1; j <= y; j++) {
+                    if (chessBoard[i][j++] == mode) {
+                        counter++;
+                    }
+                    break;
+                }
+            }
+            if (counter == numChain) {
+                chessBoard[x][y] = 0;
+                return true;
+            }
+        }
 
-    	//for numChain to north-east
-    	if (x + numChain - 1 <= 14 && y - numChain + 1 >= 0) {
-    		counter = 0;
-    		for (int i = x + numChain - 1; i >= x; i--) {
-    			for (int j = y - numChain + 1; j <= y; j++) {
-    				if (chessBoard[i][j++] == mode) {
-        				counter++;
-    				}
-    				break;
-    			}
-    		}
-    		if (counter == numChain) {
-    			chessBoard[x][y] = 0;
-    			return true;
-    		}
+        //for numChain to north-east
+        if (x + numChain - 1 <= 14 && y - numChain + 1 >= 0) {
+            counter = 0;
+            for (int i = x + numChain - 1; i >= x; i--) {
+                for (int j = y - numChain + 1; j <= y; j++) {
+                    if (chessBoard[i][j++] == mode) {
+                        counter++;
+                    }
+                    break;
+                }
+            }
+            if (counter == numChain) {
+                chessBoard[x][y] = 0;
+                return true;
+            }
 
-    	}
+        }
 
-    	//for numChain to south-west
-    	if (x - numChain + 1 >= 0 && y + numChain - 1 <= 14) {
-    		counter = 0;
-    		for (int i = x - numChain + 1; i <= x; i++) {
-    			for (int j = y + numChain - 1; j >= y; j--) {
-    				if (chessBoard[i][j--] == mode) {
-        				counter++;
-    				}
-    				break;
-    			}
-    		}
-    		if (counter == numChain) {
-    			chessBoard[x][y] = 0;
-    			return true;
-    		}
-    	}
+        //for numChain to south-west
+        if (x - numChain + 1 >= 0 && y + numChain - 1 <= 14) {
+            counter = 0;
+            for (int i = x - numChain + 1; i <= x; i++) {
+                for (int j = y + numChain - 1; j >= y; j--) {
+                    if (chessBoard[i][j--] == mode) {
+                        counter++;
+                    }
+                    break;
+                }
+            }
+            if (counter == numChain) {
+                chessBoard[x][y] = 0;
+                return true;
+            }
+        }
 
-    	//for numChain to south-east
-    	if (x + numChain - 1 <= 14 && y + numChain - 1 <= 14) {
-    		counter = 0;
-    		for (int i = x + numChain - 1; i >= x; i--) {
-    			for (int j = y + numChain - 1; j >= y; j--) {
-    				if (chessBoard[i][j--] == mode) {
-        				counter++;
-    				}
-    				break;
-    			}
-    		}
-    		if (counter == numChain) {
-    			chessBoard[x][y] = 0;
-    			return true;
-    		}
-    	}
+        //for numChain to south-east
+        if (x + numChain - 1 <= 14 && y + numChain - 1 <= 14) {
+            counter = 0;
+            for (int i = x + numChain - 1; i >= x; i--) {
+                for (int j = y + numChain - 1; j >= y; j--) {
+                    if (chessBoard[i][j--] == mode) {
+                        counter++;
+                    }
+                    break;
+                }
+            }
+            if (counter == numChain) {
+                chessBoard[x][y] = 0;
+                return true;
+            }
+        }
 
 
-
-    	return false;
-
+        return false;
 
 
     }
@@ -556,9 +557,7 @@ public static final int[][] cweight = new int[15][15];
         for (int iX = xMin; iX <= xMax; iX++) {
             rowData[0][iX - xMin] = chessBoard[iX][y];
         }
-        for (int iY = yMin; iY <= yMax; iY++) {
-            rowData[1][iY - yMin] = chessBoard[x][iY];
-        }
+        System.arraycopy(chessBoard[x], yMin, rowData[1], yMin - yMin, yMax + 1 - yMin);
 
         int tmpI = 0;
         while (tmpI <= 4 && x + tmpI <= xMax && y + tmpI <= yMax) {

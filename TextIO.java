@@ -1011,7 +1011,7 @@ public class TextIO {
                 errorMessage("Integer value not found in input.",
                         "Integer in the range " + min + " to " + max);
             } else {
-                String str = s.toString();
+                String str = s;
                 try {
                     x = Long.parseLong(str);
                 } catch (NumberFormatException e) {
