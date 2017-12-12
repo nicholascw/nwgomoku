@@ -14,9 +14,9 @@ Some rights reserved.
 
 ### Obtain
 
-##### Dependency:
+##### Dependencies:
     Java, Bash
-    Optional:any SSH implementation, screen *(To multiplayer via internet)*
+    Optional:any SSH implementation, screen (To multiplayer via internet)
 ##### Build from source
 ```bash
 $ git clone https://github.com/nicholascw/nwgomoku.git
